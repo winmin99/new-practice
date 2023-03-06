@@ -77,3 +77,39 @@ new Map({
     projection: "EPSG:5187"
   })
 });
+// olMap.js
+
+export default class OpenLayersMap {
+  constructor(target) {
+    this.target = target;
+    this.init();
+  }
+
+  init() {
+    const olViewCenter = olProj.fromLonLat([128.624043, 36.805679]);
+
+    this.map = new olMap({
+      target: this.target,
+      view: new olView({
+        center: olViewCenter,
+        zoom: 13,
+      }),
+    });
+
+    // OpenLayers 지도 이동 이벤트 핸들러 등록
+    this.map.on('moveend', (evt) => {
+      const olMapCenter = evt.target.getView().getCenter();
+      const [lon, lat] = olProj.toLonLat(olMapCenter);
+
+      // Custom 이벤트 발생
+      const event = new CustomEvent('mapMoveEnd', {
+        detail: {
+          center: { lon, lat },
+        },
+      });
+
+      // document에 이벤트 발생
+      document.dispatchEvent(event);
+    });
+  }
+}
