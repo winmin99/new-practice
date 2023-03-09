@@ -64,6 +64,6 @@
 });
   circle.setMap(kakaoMap); //지도위에 원을 생성
 
-  export { kakaoMap, viewSyncOptions, mapContainer }
+  export { kakaoMap, viewSyncOptions, mapContainer, marker }
 
 
