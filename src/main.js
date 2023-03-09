@@ -1,31 +1,26 @@
 import Feature from "ol/Feature";
 import Map from "ol/Map";
 import View from "ol/View";
-import { Circle } from "ol/geom";
-import Projection from "ol/proj/Projection";
-import { OSM, Vector as VectorSource } from "ol/source";
-import { Style } from "ol/style";
-import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer";
-import { transform, addProjection, fromLonLat } from "ol/proj";
+import {Circle} from "ol/geom";
+import {Vector as VectorSource} from "ol/source";
+import {Stroke, Style} from "ol/style";
+import {Vector as VectorLayer} from "ol/layer";
+import {fromLonLat, toLonLat} from "ol/proj";
+import {default as epsg5187} from './projection';
+import {kakaoMap} from "./kakao";
+import {default as defaultInteractions} from './Interaction';
+import {GeoJSON} from "ol/format";
 
 // Define the EPSG:5187 projection
-addProjection(
-    new Projection({
-      code: "EPSG:5187",
-      // extent: [-415909.65, -442561.51, 716844.45, 865410.62],
-      units: "m",
-      axisOrientation: "neu",
-      global: false
-      // You can add additional properties here if necessary
-    })
-);
-
+// addProjection(epsg5187);
 // Use the new projection
 const lonLatCoord = [128.624043, 36.805679];
-const epsg5187Coord = transform(fromLonLat(lonLatCoord), "EPSG:4326", "EPSG:5187");
+const epsg5187Coord = fromLonLat(lonLatCoord, "EPSG:5187"); // [128.624043, 36.805679] > 5187 로 바뀐 좌표
+//fromLonLat은 첫번째 인자로 들어온좌표(경도와 위도 순으로 들어와야됨) 를 두번째 인자로 지정한 좌표로 바꿔준다.
 
+//Feature에서 지오메트리 값을 받아와서 원을 생성
 const circleFeature = new Feature({
-  geometry: new Circle(epsg5187Coord, 1e2)
+  geometry: new Circle(epsg5187Coord, 1e3)
 });
 circleFeature.setStyle(
     new Style({
@@ -57,59 +52,69 @@ circleFeature.setStyle(
 
         ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
         ctx.strokeStyle = "rgba(255,0,0,1)";
-        ctx.stroke();
+        ctx.stroke();new Style({
+          stroke: new Stroke({
+            color: '#0033ff',
+            width: 2
+          })
+        })
       }
     })
 );
 
-new Map({
+//olMap을 지도옵션으로 생성
+const olMap = new Map({
+  interactions: defaultInteractions,
   layers: [
     new VectorLayer({
       source: new VectorSource({
-        features: [circleFeature]
+        format: new GeoJSON(),
+        url: "http://djgis.iptime.org:8000/geoserver/yeongju_a/wfs?typename=yeongju_a%3Aviw_wtl_pipe_lm&service=WFS&version=2.0.0&request=GetFeature&outputFormat=application%2Fjson&propertyName=geom"
+      }),
+      style: new Style({
+        stroke: new Stroke({
+          color: '#0033ff',
+          width: 1.5
+        })
       })
     })
   ],
   target: "olMap",
   view: new View({
     center: epsg5187Coord,
-    zoom: 18,
-    projection: "EPSG:5187"
+    zoom: 12.3,
+    constrainResolution: false,
+    constrainRotation: false,
+    minZoom: 5.3,
+    maxZoom: 14.3,
+    projection: epsg5187,
+    rotation: -0.02307, //맵을 회전시킴
   })
 });
-// olMap.js
 
-export default class OpenLayersMap {
-  constructor(target) {
-    this.target = target;
-    this.init();
+//모든 로드를 마치고 마지막에 현재지도의 줌level을 보여주는 이벤트
+olMap.on('loadend', function (event) {
+  const zoom = olMap.getView().getZoom();
+  const level = kakaoMap.getLevel();
+  console.log(`ol: ${zoom} 카카오: ${level}`);
+})
+
+let currentZoom = olMap.getView().getZoom(); // 11.3 현재 정보, 유지되어야 하는 값, 프로그래밍 용어: 상태 state = 지금 현재 정보
+//olMap에서 뷰값을 가져와서 센터값을 가져와서 카카오맵 센터 좌표를 따라 가게 만듬
+olMap.getView().on('change:center', (event) => {
+  const center = event.target.getCenter();
+  const epsg4326center = toLonLat( center, "EPSG:5187");// toLonLat은 첫번째로 들어온 인자(경도와 위도 순으로 들어와야됨) 가들어오고 두번째 인자에는 첫번째 인자좌표가 어떤 좌표인지 알려줘야함)
+  console.log(epsg4326center);
+  var moveLatLon = new kakao.maps.LatLng(epsg4326center[1], epsg4326center[0]); //setCenter api를 사용하기위해 필요한 좌표로 변환하기 위해서 필요한 작업
+  console.log(moveLatLon)
+  kakaoMap.setCenter(moveLatLon);
+  if(olMap.getView().getZoom() !== currentZoom){//줌 레벨 변경시에만 실행되도록 하기위해 필요한 if
+    const level = olMap.getView().getZoom()//olMap의 줌레벨을 가져옴 현재 기본 12.3
+    console.log(level)
+    const kakaolevel = kakaoMap.getLevel()//KakaoMap의 줌레벨을 가져옴 현재 기본 3
+    console.log(kakaolevel)
+    kakaoMap.setLevel(15.3 - level)
+    console.log(`ol: ${olMap.getView().getZoom()} 카카오1: ${kakaolevel}`);
+    currentZoom = level;
   }
-
-  init() {
-    const olViewCenter = olProj.fromLonLat([128.624043, 36.805679]);
-
-    this.map = new olMap({
-      target: this.target,
-      view: new olView({
-        center: olViewCenter,
-        zoom: 13,
-      }),
-    });
-
-    // OpenLayers 지도 이동 이벤트 핸들러 등록
-    this.map.on('moveend', (evt) => {
-      const olMapCenter = evt.target.getView().getCenter();
-      const [lon, lat] = olProj.toLonLat(olMapCenter);
-
-      // Custom 이벤트 발생
-      const event = new CustomEvent('mapMoveEnd', {
-        detail: {
-          center: { lon, lat },
-        },
-      });
-
-      // document에 이벤트 발생
-      document.dispatchEvent(event);
-    });
-  }
-}
+});
