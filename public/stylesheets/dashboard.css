@@ -92,3 +92,90 @@ body {
 }
 
 
+.popup-content {
+    position: absolute;
+    animation-duration: 1s;
+    animation-name: slidein;
+    animation-direction: alternate;
+    animation-iteration-count: infinite;
+    box-sizing: border-box;
+    line-height: 100%;
+}
+.popup-content > span {
+    display: inline-block;
+    line-height: 100%;
+    width: 100%;
+    font-size:10px;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+/* CSS for the modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%;
+}
+.ol-popup-custom {
+    position: absolute;
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    width: 200px;
+    height: 200px;
+    z-index: 1000;
+}
+
+.popup-form {
+    display: flex;
+    flex-direction: column;
+    margin: 1px;
+    padding: 1px;
+
+}
+
+.popup-select {
+    margin-top: 3px;
+    padding: 1px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 1px;
+}
+.popup-select:hover{
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+.popup-select:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+.popup-select option {
+
+}
+
+.popup-form label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 1px;
+}
+.popup-form label:hover{
+    color: blue;
+    cursor: pointer;
+}
+

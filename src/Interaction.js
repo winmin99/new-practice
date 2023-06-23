@@ -1,4 +1,6 @@
 import {defaults as defaultInteractions, DoubleClickZoom, Draw, MouseWheelZoom, Select} from 'ol/interaction';
+import { mouseActionButton, singleClick } from 'ol/events/condition';
+import {Fill, Stroke, Style} from 'ol/style';
 
 //Openlayers 지도와 상호작용 하는 옵션
 export default defaultInteractions({
@@ -21,3 +23,17 @@ export default defaultInteractions({
     useAnchor: true,
   }),
 ]);
+
+export class SelectInteraction extends Select {
+
+  constructor(options) {
+    if (!options['map']) {
+      throw new Error('Map is undefined');
+    }
+
+    super({
+      condition: singleClick,
+      hitTolerance: 10,
+    });
+  }
+}

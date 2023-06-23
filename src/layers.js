@@ -6,7 +6,7 @@ import {Stroke, Style} from "ol/style";
 const layers = new VectorLayer({
   source: new VectorSource({
     format: new GeoJSON(),
-    url: "http://djgis.iptime.org:8000/geoserver/yeongju_a/wfs?typename=yeongju_a%3Aviw_wtl_pipe_lm&service=WFS&version=2.0.0&request=GetFeature&outputFormat=application%2Fjson&propertyName=geom"
+    url: "http://djgis.iptime.org:8000/geoserver/yeongju_a/wfs?typename=yeongju_a%3Aviw_wtl_pipe_lm&service=WFS&version=2.0.0&request=GetFeature&outputFormat=application%2Fjson&propertyName=geom,관리번호,레이어,관라벨"
   }),
   style: new Style({
     stroke: new Stroke({

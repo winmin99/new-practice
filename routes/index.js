@@ -11,5 +11,11 @@ router.get('/dashboard', function (req, res, next) {
   res.render('dashboard', {title: 'Express'});
 });
 
+/* GET home page. */
+router.get('/modal', function (req, res, next) {
+  res.render('modal', {title: 'Express'});
+});
+
+
 
 module.exports = router;
