@@ -33,6 +33,7 @@ export class SelectInteraction extends Select {
 
     super({
       condition: singleClick,
+      multi:true,
       hitTolerance: 10,
     });
   }

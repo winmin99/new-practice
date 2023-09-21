@@ -40,11 +40,11 @@ function onChangeCenter(event) {
   kakaoMap.setCenter(moveLatLon);
   if (view.getZoom() !== currentZoom) {//줌 레벨 변경시에만 실행되도록 하기위해 필요한 if
     const level =view.getZoom()//olMap의 줌레벨을 가져옴 현재 기본 12.3
-    // console.log(level)
+    console.log(level)
     const kakaolevel = kakaoMap.getLevel()//KakaoMap의 줌레벨을 가져옴 현재 기본 3
     // console.log("카카오레벨:",kakaolevel)
     kakaoMap.setLevel(15.3 - level)
-    // console.log(`ol: ${view.getZoom()} 카카오?: ${kakaolevel}`);
+    console.log(`ol: ${view.getZoom()} 카카오?: ${kakaolevel}`);
     currentZoom = level;
   }
 }

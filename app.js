@@ -1,5 +1,6 @@
 var createError = require('http-errors');
 var express = require('express');
+const pg = require('pg')
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -7,7 +8,34 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
-var app = express();
+const app = express();
+
+const client = new pg.Pool({
+  host: 'localhost',
+  user: 'postgres',
+  password: 'root',
+  database: 'testDB',
+  port: 5432,
+  max: 5,
+})
+
+client.connect(err => {
+  if (err) {
+    console.log('Failed to connect db ' + err)
+  } else {
+    console.log('Connect to db done!')
+  }
+})
+const query = {
+  text: "SELECT * FROM view_expense_ledger",
+};
+client
+    .query(query)
+    .then((res) => {
+      console.log(res);
+      client.end();
+    })
+    .catch((e) => console.error(e.stack));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
